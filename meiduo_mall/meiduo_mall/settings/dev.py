@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/1.11/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.11/ref/settings/
 """
-
+import datetime
 import os
 import sys
 
@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',  # 注册users应用
 ]
 
-MIDDLEWARE = [   # 请求是自上而下,响应是自下而上的
+MIDDLEWARE = [  # 请求是自上而下,响应是自下而上的
 
     'corsheaders.middleware.CorsMiddleware',  # 最外层的中间件,用来解决跨域请求问题
 
@@ -87,7 +87,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'meiduo_mall.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
@@ -101,7 +100,6 @@ DATABASES = {
         'NAME': 'meiduo_mall'  # 数据库名字
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
@@ -121,7 +119,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
@@ -139,13 +136,10 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-
-
 
 # 配置redis数据库作为缓存后端
 CACHES = {
@@ -173,8 +167,6 @@ CACHES = {
 }
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "session"
-
-
 
 # 日志
 LOGGING = {
@@ -218,19 +210,26 @@ LOGGING = {
     }
 }
 
-
 # DRF配置
 REST_FRAMEWORK = {
     # 异常处理
     'EXCEPTION_HANDLER': 'meiduo_mall.utils.exceptions.exception_handler',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
 }
 
+# JWT的有效期
+JWT_AUTH = {'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
+            'JWT_RESPONSE_PAYLOAD_HANDLER': 'users.utils.jwt_response_payload_handler',
+            }
 
 # 指定默认的用户模型类
 # String model references must be of the form 'app_label.ModelName' 指定用户认证模型必须以应用名.模型名写法
 # AUTH_USER_MODEL = 'meiduo_mall.apps.users.User'
 AUTH_USER_MODEL = 'users.User'
-
 
 # CORS  追加白名单
 
