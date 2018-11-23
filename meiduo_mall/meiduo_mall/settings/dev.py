@@ -1,3 +1,5 @@
+# 开发阶段的配置
+
 """
 Django settings for meiduo_mall project.
 
@@ -11,20 +13,30 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
-import sys  #增加系统路径
+import sys
+
+# os.path 主要用来拼接路径
+#  /Users/chao/Desktop/meiduo_SZ20/meiduo_mall', '/Users/chao/Desktop/meiduo_SZ20'
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+# /Users/chao/Desktop/meiduo_SZ20/meiduo_mall/meiduo_mall
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(os.path.join(BASE_DIR, 'apps'))  #增加导包路径
+# 给系统的导包列表中多加一个导包路径
+sys.path.append(os.path.join(BASE_DIR, 'apps'))
+# print(BASE_DIR)
+# print(sys.path)  # 导包路径
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '6!%nje966ndpymj%e+m!e10h*y(w!$lv0_w0^@2d5gd4^d2&9('
+SECRET_KEY = '=y5bzg+9i*n8vix6n33lbk-of2mwk@hn$877q(27wmh)6xlf1c'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# 允许那些主机能访问我的django
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'www.meiduo.site', 'api.meiduo.site']
 
 # Application definition
 
@@ -36,12 +48,16 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'rest_framework',  # 注册DRF
+    'rest_framework',  # 注册DRF  如果应用中用到模板或模型建表一定要注册
+    'corsheaders',  # 注册cors 解决跨域请求问题
 
-    'users.apps.UsersConfig'  #注册users应用
+    'users.apps.UsersConfig',  # 注册users应用
 ]
 
-MIDDLEWARE = [
+MIDDLEWARE = [   # 请求是自上而下,响应是自下而上的
+
+    'corsheaders.middleware.CorsMiddleware',  # 最外层的中间件,用来解决跨域请求问题
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -71,26 +87,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'meiduo_mall.wsgi.application'
 
+
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'HOST': '127.0.0.1',  # 数据库主机
-        'PORT': 3306,  # 数据库端口口
-        'USER': 'meiduo',  # 数据库用用户名
-        'PASSWORD': 'meiduo',  # 数据库用用户密码
+        'PORT': 3306,  # 数据库端口
+        'USER': 'meiduo',  # 数据库用户名
+        'PASSWORD': 'meiduo',  # 数据库用户密码
         'NAME': 'meiduo_mall'  # 数据库名字
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
@@ -110,16 +121,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
 # LANGUAGE_CODE = 'en-us'
 #
 # TIME_ZONE = 'UTC'
-
-
+# 简体中文
 LANGUAGE_CODE = 'zh-Hans'
-
+# 亚洲/上海时区
 TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
@@ -128,12 +139,15 @@ USE_L10N = True
 
 USE_TZ = True
 
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
 
-# 配置redis
+
+
+# 配置redis数据库作为缓存后端
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -148,17 +162,25 @@ CACHES = {
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
+    },
+    "verify_codes": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1/2",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
     }
 }
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "session"
 
 
-# 日日志
+
+# 日志
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,  # 是否禁用用已经存在的日日志器器
-    'formatters': {  # 日日志信息显示的格式
+    'disable_existing_loggers': False,  # 是否禁用已经存在的日志器
+    'formatters': {  # 日志信息显示的格式
         'verbose': {
             'format': '%(levelname)s %(asctime)s %(module)s %(lineno)d %(message)s'
         },
@@ -166,39 +188,55 @@ LOGGING = {
             'format': '%(levelname)s %(module)s %(lineno)d %(message)s'
         },
     },
-    'filters': {  # 对日日志进行行行过滤
-        'require_debug_true': {  # django在debug模式下才输出日日志
+    'filters': {  # 对日志进行过滤
+        'require_debug_true': {  # django在debug模式下才输出日志
             '()': 'django.utils.log.RequireDebugTrue',
         },
     },
-    'handlers': {  # 日日志处理理方方法
-        'console': {  # 向终端中输出日日志
+    'handlers': {  # 日志处理方法
+        'console': {  # 向终端中输出日志
             'level': 'INFO',
             'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
         },
-        'file': {  # 向文文件中输出日日志
+        'file': {  # 向文件中输出日志
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(os.path.dirname(BASE_DIR), "logs/meiduo.log"),
+            'filename': os.path.join(os.path.dirname(BASE_DIR), "logs/meiduo.log"),  # 日志文件的位置
             'maxBytes': 300 * 1024 * 1024,
             'backupCount': 10,
             'formatter': 'verbose'
         },
     },
-    'loggers': {  # 日日志器器
-        'django': {  # 定义了了一一个名为django的日日志器器
-            'handlers': ['console', 'file'],  # 可以同时向终端与文文件中输出日日志
-            'propagate': True,  # 是否继续传递日日志信息
-            'level': 'INFO',  # 日日志器器接收的最低日日志级别
+    'loggers': {  # 日志器
+        'django': {  # 定义了一个名为django的日志器
+            'handlers': ['console', 'file'],  # 可以同时向终端与文件中输出日志
+            'propagate': True,  # 是否继续传递日志信息
+            'level': 'INFO',  # 日志器接收的最低日志级别
         },
     }
 }
-#注册异常捕获
+
+
+# DRF配置
 REST_FRAMEWORK = {
-    # 异常处理理
+    # 异常处理
     'EXCEPTION_HANDLER': 'meiduo_mall.utils.exceptions.exception_handler',
 }
 
-AUTH_USER_MODEL = 'users.User'  #注册模型类用来替换掉系统自带的
+
+# 指定默认的用户模型类
+# String model references must be of the form 'app_label.ModelName' 指定用户认证模型必须以应用名.模型名写法
+# AUTH_USER_MODEL = 'meiduo_mall.apps.users.User'
+AUTH_USER_MODEL = 'users.User'
+
+
+# CORS  追加白名单
+
+CORS_ORIGIN_WHITELIST = (
+    '127.0.0.1:8080',
+    'localhost:8080',
+
+)
+CORS_ALLOW_CREDENTIALS = True  # 允许跨域后携带cookie

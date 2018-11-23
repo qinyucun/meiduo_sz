@@ -1,6 +1,7 @@
 var vm = new Vue({
     el: '#app',
     data: {
+        // host: host,
         host,
         error_name: false,
         error_password: false,
@@ -16,11 +17,11 @@ var vm = new Vue({
         mobile: '',
         sms_code: '',
         allow: false,
+        sms_code_tip: '获取短信验证码',  // 短信验证码提示
+        error_sms_code_message: '',  // 验证码错误提示
+        error_name_message: '',  // 用户名错误提示
+        error_phone_message: '',  // 手机号码错误提示
 
-        sms_code_tip: '获取短信验证码',  // 短信验证码标签
-        error_sms_code_message: '',  // 验证码错误信息提示
-        error_name_message: '',  // 用户名错误信息提示
-        error_phone_message: '', // 手机号错误信息提示
     },
     methods: {
         // 检查用户名
@@ -65,9 +66,9 @@ var vm = new Vue({
                 this.error_check_password = false;
             }
         },
-        // 检查手机号
+// 检查手机号
         check_phone: function () {
-            var re = /^1[3456789]\d{9}$/;
+            var re = /^1[3-9]\d{9}$/;
             if (re.test(this.mobile)) {
                 this.error_phone = false;
             } else {
@@ -121,6 +122,7 @@ var vm = new Vue({
             }
 
             // 向后端接口发送请求，让后端发送短信验证码
+            // axios.get('http://127.0.0.1:8000' + '/sms_codes/' + this.mobile + '/', {
             axios.get(this.host + '/sms_codes/' + this.mobile + '/', {
                 responseType: 'json'
             })
@@ -149,7 +151,6 @@ var vm = new Vue({
                         // 展示发送短信错误提示
                         this.error_sms_code = true;
                         this.error_sms_code_message = error.response.data.message;
-
                     } else {
                         console.log(error.response.data);
                     }
@@ -178,12 +179,6 @@ var vm = new Vue({
                     responseType: 'json'
                 })
                     .then(response => {
-                        // 记录用户的登录状态
-                        sessionStorage.clear();
-                        localStorage.clear();
-                        localStorage.token = response.data.token;
-                        localStorage.username = response.data.username;
-                        localStorage.user_id = response.data.id;
                         location.href = '/index.html';
                     })
                     .catch(error => {
@@ -200,6 +195,5 @@ var vm = new Vue({
                     })
             }
         }
-
     }
 });
