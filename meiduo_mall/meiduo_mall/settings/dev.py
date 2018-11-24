@@ -230,7 +230,8 @@ JWT_AUTH = {'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
 # String model references must be of the form 'app_label.ModelName' 指定用户认证模型必须以应用名.模型名写法
 # AUTH_USER_MODEL = 'meiduo_mall.apps.users.User'
 AUTH_USER_MODEL = 'users.User'
-
+AUTHENTICATION_BACKENDS = ['users.utils.UsernameMobileAuthBackend',
+                           ]
 # CORS  追加白名单
 
 CORS_ORIGIN_WHITELIST = (
@@ -239,3 +240,4 @@ CORS_ORIGIN_WHITELIST = (
 
 )
 CORS_ALLOW_CREDENTIALS = True  # 允许跨域后携带cookie
+
