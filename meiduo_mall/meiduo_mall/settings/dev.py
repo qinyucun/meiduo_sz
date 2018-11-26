@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'corsheaders',  # 注册cors 解决跨域请求问题
 
     'users.apps.UsersConfig',  # 注册users应用
+    'oauth.apps.OauthConfig',  # 注册qq登陆模型类
 ]
 
 MIDDLEWARE = [  # 请求是自上而下,响应是自下而上的
@@ -237,7 +238,12 @@ AUTHENTICATION_BACKENDS = ['users.utils.UsernameMobileAuthBackend',
 CORS_ORIGIN_WHITELIST = (
     '127.0.0.1:8080',
     'localhost:8080',
+    'www.meiduo.site:8080',
+    'api.meiduo.site:8000',
 
 )
 CORS_ALLOW_CREDENTIALS = True  # 允许跨域后携带cookie
 
+QQ_CLIENT_ID = '101474184'
+QQ_CLIENT_SECRET = 'c6ce949e04e12ecc909ae6a8b09b637c'
+QQ_REDIRECT_URI = 'http://www.meiduo.site:8080/oauth_callback.html'
