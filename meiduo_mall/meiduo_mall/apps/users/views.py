@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from rest_framework import status
 from rest_framework.generics import CreateAPIView, UpdateAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -7,6 +8,20 @@ from rest_framework.generics import RetrieveAPIView
 
 from .serializers import CreateUserSerializer, UserDetailSerializer, EmailSerializer
 from .models import User
+
+
+class VerifyEmailView(APIView):
+    def get(self, request):
+        token = request.query_params.get('token')
+        if not token:
+            return Response({'message': '缺少token'}, status=status.HTTP_400_BAD_REQUEST)
+        user = User.check_verify_email_url(token)
+        if not user:
+            return Response({'message': '无效的token'}, status=status.HTTP_400_BAD_REQUEST)
+        # 修改email_active,完成验证
+        user.email_active = True
+        user.save()
+        return Response({'message': 'OK'})
 
 
 class EmailView(UpdateAPIView):

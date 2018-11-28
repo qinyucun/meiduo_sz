@@ -120,6 +120,7 @@ class EmailSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         instance.email = validated_data['email']
         instance.save()
-        verify_url = ""
+        #生成激活连接
+        verify_url = instance.generate_email_url()
         send_verify_email.delay(instance.email, verify_url)
         return instance
