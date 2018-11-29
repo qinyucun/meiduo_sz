@@ -1,13 +1,33 @@
 from django.shortcuts import render
-from rest_framework import status
+from rest_framework import status, mixins
 from rest_framework.generics import CreateAPIView, UpdateAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import RetrieveAPIView
+from rest_framework.viewsets import GenericViewSet
 
-from .serializers import CreateUserSerializer, UserDetailSerializer, EmailSerializer
+from .serializers import CreateUserSerializer, UserDetailSerializer, EmailSerializer, UserAddressSerializer
 from .models import User
+from . import constants
+
+
+class AddressViewSet(mixins.CreateModelMixin, GenericViewSet):
+    """用户地址增删改查"""
+    serializer_class = UserAddressSerializer
+    permission_classes = [IsAuthenticated]
+
+    # post/addresses/
+    def create(self, request, *args, **kwargs):
+        # 判断用户地址是否达上线
+        count = request.user.addresses.count()
+        if count >= constants.USER_ADDRESS_COUNTS_LIMIT:
+            return Response({'message': '保存的地址已达上限'}, status=status.HTTP_400_BAD_REQUEST)
+        return super().create(request, *args, **kwargs)
+        # serializer = self.get_serializer(data=request.data)
+        # serializer.is_valid(raise_exception=True)
+        # serializer.save()
+        # return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class VerifyEmailView(APIView):
