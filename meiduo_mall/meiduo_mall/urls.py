@@ -25,4 +25,6 @@ urlpatterns = [
     url(r'^', include('users.urls')),
     #验证注册路由
     url(r'^oauth/', include('oauth.urls')),
+    #查询三级联动省市区
+    url(r'^', include('areas.urls')),
 ]

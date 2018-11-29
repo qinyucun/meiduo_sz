@@ -53,6 +53,7 @@ INSTALLED_APPS = [
 
     'users.apps.UsersConfig',  # 注册users应用
     'oauth.apps.OauthConfig',  # 注册qq登陆模型类
+    'areas.apps.AreasConfig',  # 省市区的三级联动
 ]
 
 MIDDLEWARE = [  # 请求是自上而下,响应是自下而上的
