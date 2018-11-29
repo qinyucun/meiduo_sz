@@ -1,13 +1,13 @@
 from django.shortcuts import render
 from rest_framework.viewsets import ReadOnlyModelViewSet
-# from rest_framework_extensions.mixins import CacheResponseMixin
+from rest_framework_extensions.mixins import CacheResponseMixin
 
 from .models import Area
 from .serializers import AreaSerializer, SubAreaSerializer
 
 
 # Create your views here.
-class AreasViewSet(ReadOnlyModelViewSet):
+class AreasViewSet(CacheResponseMixin, ReadOnlyModelViewSet):
     """返回省市区数据"""
 
     pagination_class = None  # 禁用分页
