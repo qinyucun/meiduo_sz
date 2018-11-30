@@ -17,14 +17,17 @@ from django.conf.urls import url, include
 from django.contrib import admin
 
 urlpatterns = [
+    # 副文本文本编辑器的路由
+    url(r'^ckeditor/', include('ckeditor_uploader.urls')),
+
     url(r'^admin/', admin.site.urls),
 
     # 发短信
     url(r'^', include('verifications.urls')),
     # 用户
     url(r'^', include('users.urls')),
-    #验证注册路由
+    # 验证注册路由
     url(r'^oauth/', include('oauth.urls')),
-    #查询三级联动省市区
+    # 查询三级联动省市区
     url(r'^', include('areas.urls')),
 ]
