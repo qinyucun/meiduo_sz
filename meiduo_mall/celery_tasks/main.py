@@ -4,9 +4,9 @@
 from celery import Celery
 
 import os
+
 if not os.getenv('DJANGO_SETTINGS_MODULE'):
     os.environ['DJANGO_SETTINGS_MODULE'] = 'meiduo_mall.settings.dev'
-
 
 # 1.创建celery客户端  (里面的meiduo_sz20只是一个别名没有任何实际意思义,不写也行)
 celery_app = Celery('meiduo_sz20')
@@ -17,4 +17,4 @@ celery_app.config_from_object('celery_tasks.config')
 # 3.注册任务
 # celery_app.autodiscover_tasks('celery_tasks.sms')  任务将来可以有多个,一定要把任务放在列表中
 
-celery_app.autodiscover_tasks(['celery_tasks.sms', 'celery_tasks.email'])
+celery_app.autodiscover_tasks(['celery_tasks.sms', 'celery_tasks.email', 'celery_tasks.html'])
