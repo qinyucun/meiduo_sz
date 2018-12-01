@@ -31,15 +31,22 @@ class FastDFSStorage(Storage):
         :param content: 文件内容
         :return: 保存到数据库中的文件名
         """
-        pass
+        # 加载fdfs的客户端配置文件来创建出一个fdfs客户端
+        # client = Fdfs_client('meiduo_mall/utils/fastdfs/client.conf')
+        # client = Fdfs_client(settings.FDFS_CLIENT_CONF)
+        client = Fdfs_client(self.client_conf)
 
-    def url(self, name):
-        """
-        返回完整的url路径
-        :param name: 数据库中保存的文件名
-        :return: 完整的url
-        """
-        return self.client_conf + name
+        # 下面这种上传方式需要知道当前要上传文件的本地路径
+        # ret = client.upload_by_filename('/Users/chao/Desktop/01.jpg')  此方法上传到storage中的文件会有后缀
+        ret = client.upload_appender_by_buffer(content.read())  # 此方法上传的文件无后缀
+
+        # 判断文件是否上传成功
+        status = ret.get('Status')  # 取出当前图片上传后响应的状态
+        if status != 'Upload successed.':
+            raise Exception('Upload file failed')  # 文件上传失败
+        # 如果能执行到这里,说明文件上传成功了
+        file_id = ret.get('Remote file_id')
+        return file_id
 
     def exists(self, name):
         """
@@ -48,3 +55,11 @@ class FastDFSStorage(Storage):
         :param name: 文件名
         :return: False
         """
+
+    def url(self, name):
+        """
+        返回完整的url路径
+        :param name: 数据库中保存的文件名
+        :return: 完整的url
+        """
+        return settings.FDFS_BASE_URL + name

@@ -50,14 +50,16 @@ INSTALLED_APPS = [
 
     'rest_framework',  # 注册DRF  如果应用中用到模板或模型建表一定要注册
     'corsheaders',  # 注册cors 解决跨域请求问题
+    'django_crontab',  # 定时任务
+    'ckeditor',  # 富文本编辑器
+    'ckeditor_uploader',  # 富文本编辑器上传图片模块
 
     'users.apps.UsersConfig',  # 注册users应用
     'oauth.apps.OauthConfig',  # 注册qq登陆模型类
     'areas.apps.AreasConfig',  # 省市区的三级联动
     'goods.apps.GoodsConfig',  # 商品
     'contents.apps.ContentsConfig',  # 首页广告
-    'ckeditor',  # 富文本编辑器
-    'ckeditor_uploader',  # 富文本编辑器上传图片模块
+
 ]
 
 MIDDLEWARE = [  # 请求是自上而下,响应是自下而上的
@@ -78,7 +80,7 @@ ROOT_URLCONF = 'meiduo_mall.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR,"templates")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -277,6 +279,7 @@ DEFAULT_FILE_STORAGE = 'meiduo_mall.utils.fastdfs.fdfs_storage.FastDFSStorage'
 
 # FastDFS
 FDFS_BASE_URL = 'http://192.168.14.220:8888/'
+
 FDFS_CLIENT_CONF = os.path.join(BASE_DIR, 'utils/fastdfs/client.conf')
 
 # 富文本编辑器ckeditor配置
@@ -288,3 +291,16 @@ CKEDITOR_CONFIGS = {
     },
 }
 CKEDITOR_UPLOAD_PATH = ''  # 上传图片保存路径，使用了FastDFS，所以此处设为''
+
+# 生成的静态html文件保存目录
+GENERATED_STATIC_HTML_FILES_DIR = os.path.join(os.path.dirname(os.path.dirname(BASE_DIR)), 'front_end_pc')
+
+# 定时任务
+CRONJOBS = [
+    # 每5分钟执行一次生成主页静态文件
+    ('*/1 * * * *', 'contents.crons.generate_static_index_html',
+        '>> /home/python/Desktop/meiduo_sz/meiduo_mall/logs/crontab.log')
+]
+
+# 解决crontab中文问题
+CRONTAB_COMMAND_PREFIX = 'LANG_ALL=zh_cn.UTF-8'
