@@ -30,4 +30,6 @@ urlpatterns = [
     url(r'^oauth/', include('oauth.urls')),
     # 查询三级联动省市区
     url(r'^', include('areas.urls')),
+    #商品查询
+    url(r'^', include('goods.urls')),
 ]
