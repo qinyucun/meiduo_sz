@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django_redis import get_redis_connection
 from rest_framework import status, mixins
 from rest_framework.decorators import action
 from rest_framework.generics import CreateAPIView, UpdateAPIView
@@ -8,10 +9,32 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.viewsets import GenericViewSet
 
+from goods.models import SKU
 from .serializers import CreateUserSerializer, UserDetailSerializer, \
-    EmailSerializer, UserAddressSerializer, AddressTitleSerializer
+    EmailSerializer, UserAddressSerializer, AddressTitleSerializer, UserBrowseHistorySerializer
 from .models import User
 from . import constants
+from goods.serializers import SKUSerializers
+
+
+class UserBrowseHistoryView(CreateAPIView):
+    """保存用户历史记录"""
+    serializer_class = UserBrowseHistorySerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        """获取"""
+        user_id = request.user.id
+        redis_conn = get_redis_connection("history")
+        history = redis_conn.lrange("history_%s" % user_id, 0, constants.USER_BROWSING_HISTORY_COUNTS_LIMIT - 1)
+        skus = []
+        # 为了保持查询出的顺序与用户的浏览历史保存顺序一致
+        for sku_id in history:
+            sku = SKU.objects.get(id=sku_id)
+            skus.append(sku)
+
+        s = SKUSerializers(skus, many=True)
+        return Response(s.data)
 
 
 class AddressViewSet(mixins.CreateModelMixin, mixins.UpdateModelMixin, GenericViewSet):
